@@ -106,7 +106,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            max-height: calc(100vh - 4rem);
+            min-height: calc(100vh - 4rem);
             transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
             will-change: transform;
         }
@@ -121,10 +121,9 @@
         header h1 i { color: var(--primary-color); }
         header p { font-size: 0.9rem; color: var(--text-muted-color); margin-top: 0.25rem; }
 
-        .theme-toggle-btn {
+        .header-btn {
             position: absolute;
             top: 1.5rem;
-            right: 2rem;
             width: 40px;
             height: 40px;
             border-radius: 50%;
@@ -139,9 +138,94 @@
             box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
             transition: all var(--transition-speed) ease;
         }
-        .theme-toggle-btn:hover { color: var(--primary-color); }
-        .theme-toggle-btn:active {
+        .header-btn:hover { color: var(--primary-color); }
+        .header-btn:active {
             box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+        
+        .theme-toggle-btn {
+            right: 2rem;
+        }
+        
+        .info-btn {
+            right: 5rem;
+        }
+        
+        .info-tooltip {
+            position: absolute;
+            top: 5rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-m);
+            padding: 1rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            max-width: 300px;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        
+        .info-tooltip.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        
+        .info-tooltip h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-tooltip p {
+            font-size: 0.8rem;
+            color: var(--text-muted-color);
+            line-height: 1.4;
+            margin-bottom: 0.75rem;
+        }
+        
+        .info-tooltip a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .info-tooltip a:hover {
+            text-decoration: underline;
+        }
+        
+        .app-container .main-content {
+            filter: blur(0);
+            transition: filter 0.3s ease;
+        }
+        
+        .app-container header {
+            filter: blur(0);
+            transition: filter 0.3s ease;
+        }
+        
+        .app-container.blur-behind .main-content {
+            filter: blur(6px);
+        }
+        
+        .app-container.blur-behind header {
+            filter: blur(6px);
+        }
+        
+        .info-btn,
+        .info-tooltip {
+            isolation: isolate;
+            filter: blur(0) !important;
+            z-index: 1001;
         }
 
         .main-content {
@@ -168,23 +252,35 @@
             max-height: 100vh;
         }
         
-        /* Mobile Styles - Consolidated */
+        /* Mobile View*/
         @media (max-width: 767px) {
+            body {
+                padding: 0;
+            }
+            
             .app-container {
-                overflow: visible;
-                max-height: none;
-                margin: 1rem;
+                overflow-y: auto;
+                max-height: 100vh;
             }
             
             .main-content {
                 overflow: visible;
                 padding: 0 1rem 1rem;
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
             
             .left-column {
                 overflow-y: visible;
                 padding-right: 0;
             }
+            
+            .right-column {
+                overflow-y: auto;
+                max-height: 50vh;
+            }
+            
+
         }
         .right-column { display: flex; flex-direction: column; min-height: 0; }
         
@@ -273,19 +369,43 @@
         }
 
         .options-grid { display: flex; gap: 1rem; margin-bottom: 1.5rem;}
-        .options-grid label {
+
+        
+        /* Apply shared styles */
+        .options-grid label,
+        .bw-filter-btn {
             display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
             padding: 0.75rem 1rem; border-radius: var(--radius-m);
             transition: all 0.2s ease; flex-grow: 1; justify-content: center;
-            background: transparent;
-            font-weight: 500;
+            background: transparent; font-weight: 500;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
             will-change: transform, box-shadow;
         }
         
-        .options-grid label:hover {
+        .options-grid label:hover,
+        .bw-filter-btn:hover {
             box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
             color: var(--primary-color);
+        }
+        
+        .options-grid label:has(input:checked),
+        .bw-filter-btn:has(input:checked) {
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            color: var(--primary-color); 
+            transform: translateY(2px);
+        }
+        
+        .options-grid input[type="radio"],
+        .bw-filter-btn input[type="radio"] { 
+            display: none; 
+        }
+        
+        .bw-filter-btn:first-child {
+            border-radius: var(--radius-m) 0 0 var(--radius-m);
+        }
+        
+        .bw-filter-btn:last-child {
+            border-radius: 0 var(--radius-m) var(--radius-m) 0;
         }
         
         .option-toggle {
@@ -301,37 +421,6 @@
         }
         
         .bw-filter-grid { display: flex; }
-        .bw-filter-btn {
-            display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
-            padding: 0.75rem 1rem; transition: all 0.2s ease; flex-grow: 1; justify-content: center;
-            background: transparent;
-            font-weight: 500;
-            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
-        }
-        
-        .bw-filter-btn:first-child {
-            border-radius: var(--radius-m) 0 0 var(--radius-m);
-        }
-        
-        .bw-filter-btn:last-child {
-            border-radius: 0 var(--radius-m) var(--radius-m) 0;
-        }
-        
-        .bw-filter-btn:hover {
-            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
-            color: var(--primary-color);
-        }
-        
-        .bw-filter-btn input[type="radio"] { display: none; }
-        .bw-filter-btn:has(input:checked) {
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-            color: var(--primary-color); transform: translateY(1px);
-        }
-        .options-grid input[type="radio"] { display: none; }
-        .options-grid label:has(input:checked) {
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-            color: var(--primary-color); transform: translateY(1px);
-        }
         
 
         
@@ -431,15 +520,14 @@
         .file-list-placeholder i { font-size: 2.5rem; margin-bottom: 1rem; }
         
         #action-panel { 
-            margin-top: auto; 
+            margin-top: 1.5rem; 
             padding-top: 1.5rem; 
             flex-shrink: 0;
-            position: sticky;
-            bottom: 0;
-            background: var(--bg-primary);
-            z-index: 10;
-            padding-bottom: 1rem;
         }
+        
+
+        
+
         #convert-btn {
             width: 100%; padding: 0.9rem 1rem; font-size: 1rem; font-weight: 500;
             background-color: var(--primary-color); color: white; border: none;
@@ -499,11 +587,24 @@
     <div class="app-container">
         <header>
             <h1><i class="ri-image-edit-line"></i>Converter</h1>
-            <p>Select, preview, filter, and convert your images with unparalleled control.</p>
-            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+            <p>Tool for converting batches of images locally.</p>
+            <button id="theme-toggle" class="header-btn theme-toggle-btn" title="Toggle Theme">
                 <i class="ri-moon-line"></i>
             </button>
         </header>
+        
+        <button id="info-btn" class="header-btn info-btn" title="About this tool">
+            <i class="ri-information-line"></i>
+        </button>
+        
+        <div id="info-tooltip" class="info-tooltip">
+            <h3>Pro Image Converter</h3>
+            <p>Convert images between PNG, JPG, and WEBP formats with quality control and batch processing. All processing happens locally in your browser.</p>
+            <a href="https://github.com/yourusername/webp_unconverter" target="_blank" rel="noopener">
+                <i class="ri-github-line"></i>
+                View on GitHub
+            </a>
+        </div>
 
         <div class="main-content">
             <div class="left-column">
@@ -557,13 +658,6 @@
                     </div>
                 </div>
 
-                <div id="action-panel">
-                    <button id="convert-btn" disabled>
-                        <i class="ri-download-2-line"></i>
-                        <span id="btn-text">Select Files</span>
-                    </button>
-                    <p id="status"></p>
-                </div>
             </div>
 
             <div class="right-column">
@@ -581,18 +675,29 @@
                         </button>
                     </div>
                 </div>
+                
+                <div id="action-panel">
+                    <button id="convert-btn" disabled>
+                        <i class="ri-download-2-line"></i>
+                        <span id="btn-text">Select Files</span>
+                    </button>
+                    <p id="status"></p>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // --- THEME TOGGLE SCRIPT ---
+        // --- HEADER BUTTONS SCRIPT ---
         const themeToggle = document.getElementById('theme-toggle');
+        const infoBtn = document.getElementById('info-btn');
+        const infoTooltip = document.getElementById('info-tooltip');
         const body = document.body;
-        const themeIcon = themeToggle.querySelector('i');
         const THEME_KEY = 'imageConverterTheme';
 
+        // Theme toggle functionality
         function applyTheme(theme) {
+            const themeIcon = themeToggle.querySelector('i');
             if (theme === 'dark') {
                 body.classList.add('dark-theme');
                 themeIcon.className = 'ri-sun-line';
@@ -606,6 +711,40 @@
             const newTheme = body.classList.contains('dark-theme') ? 'light' : 'dark';
             localStorage.setItem(THEME_KEY, newTheme);
             applyTheme(newTheme);
+        });
+        
+        // Info button functionality
+        function toggleInfoTooltip() {
+            const isVisible = infoTooltip.classList.toggle('show');
+            const icon = infoBtn.querySelector('i');
+            icon.className = isVisible ? 'ri-close-line' : 'ri-information-line';
+            
+            // Add/remove blur effect
+            const appContainer = document.querySelector('.app-container');
+            if (isVisible) {
+                appContainer.classList.add('blur-behind');
+            } else {
+                appContainer.classList.remove('blur-behind');
+            }
+        }
+        
+        function closeInfoTooltip() {
+            infoTooltip.classList.remove('show');
+            const icon = infoBtn.querySelector('i');
+            icon.className = 'ri-information-line';
+            
+            // Remove blur effect
+            const appContainer = document.querySelector('.app-container');
+            appContainer.classList.remove('blur-behind');
+        }
+        
+        infoBtn.addEventListener('click', toggleInfoTooltip);
+        
+        // Close tooltip when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!infoBtn.contains(e.target) && !infoTooltip.contains(e.target)) {
+                closeInfoTooltip();
+            }
         });
         
         // --- MAIN APP SCRIPT ---
@@ -990,6 +1129,8 @@
             statusMsg.className = type;
             statusMsg.textContent = message;
         }
+        
+
     </script>
 
 </body>
