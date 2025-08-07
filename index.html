@@ -77,6 +77,7 @@
             top: -15%;
             left: -15%;
             opacity: 0.8;
+            will-change: transform;
         }
 
         body::after {
@@ -86,6 +87,7 @@
             bottom: -10%;
             right: -10%;
             opacity: 0.8;
+            will-change: transform;
         }
         
         body.dark-theme::before, body.dark-theme::after {
@@ -106,8 +108,9 @@
             flex-direction: column;
             max-height: calc(100vh - 4rem);
             transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
+            will-change: transform;
         }
-
+        
         header {
             padding: 1.5rem 2rem;
             flex-shrink: 0;
@@ -156,7 +159,33 @@
             }
         }
 
-        .left-column { display: flex; flex-direction: column; overflow-y: auto; padding-right: 1rem; }
+        .left-column { 
+            display: flex; 
+            flex-direction: column; 
+            padding-right: 1rem; 
+            min-height: 0; 
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        
+        /* Mobile Styles - Consolidated */
+        @media (max-width: 767px) {
+            .app-container {
+                overflow: visible;
+                max-height: none;
+                margin: 1rem;
+            }
+            
+            .main-content {
+                overflow: visible;
+                padding: 0 1rem 1rem;
+            }
+            
+            .left-column {
+                overflow-y: visible;
+                padding-right: 0;
+            }
+        }
         .right-column { display: flex; flex-direction: column; min-height: 0; }
         
         #drop-zone {
@@ -201,6 +230,8 @@
             transition: left 0.6s ease;
         }
         
+
+        
         #drop-zone > * {
             position: relative;
             z-index: 2;
@@ -209,7 +240,11 @@
             box-shadow: inset 7px 7px 14px var(--shadow-dark), 
                         inset -7px -7px 14px var(--shadow-light);
         }
-        #drop-zone i { font-size: 3rem; color: var(--primary-color); margin-bottom: 1rem; }
+        #drop-zone i { 
+            font-size: 3rem; 
+            color: var(--primary-color); 
+            margin-bottom: 1rem;
+        }
         #drop-zone p { color: var(--text-muted-color); }
         #drop-zone p strong { color: var(--primary-color); font-weight: 500; }
         #file-input { display: none; }
@@ -245,36 +280,60 @@
             background: transparent;
             font-weight: 500;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+            will-change: transform, box-shadow;
+        }
+        
+        .options-grid label:hover {
+            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+            color: var(--primary-color);
+        }
+        
+        .option-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .option-toggle .section-title {
+            margin: 0;
+        }
+        
+        .bw-filter-grid { display: flex; }
+        .bw-filter-btn {
+            display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
+            padding: 0.75rem 1rem; transition: all 0.2s ease; flex-grow: 1; justify-content: center;
+            background: transparent;
+            font-weight: 500;
+            box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+        }
+        
+        .bw-filter-btn:first-child {
+            border-radius: var(--radius-m) 0 0 var(--radius-m);
+        }
+        
+        .bw-filter-btn:last-child {
+            border-radius: 0 var(--radius-m) var(--radius-m) 0;
+        }
+        
+        .bw-filter-btn:hover {
+            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+            color: var(--primary-color);
+        }
+        
+        .bw-filter-btn input[type="radio"] { display: none; }
+        .bw-filter-btn:has(input:checked) {
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
+            color: var(--primary-color); transform: translateY(1px);
         }
         .options-grid input[type="radio"] { display: none; }
         .options-grid label:has(input:checked) {
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
-            color: var(--primary-color);
+            color: var(--primary-color); transform: translateY(1px);
         }
         
-        .toggle-label {
-            display: flex; align-items: center; justify-content: space-between;
-            cursor: pointer; user-select: none; padding: 0.75rem 0.25rem;
-        }
-        .toggle-switch {
-            position: relative; width: 50px; height: 26px;
-            border-radius: 13px; transition: background-color 0.2s ease-in-out;
-            box-shadow: inset 3px 3px 6px var(--shadow-dark), 
-                        inset -3px -3px 6px var(--shadow-light);
-        }
-        .toggle-switch::before {
-            content: ''; position: absolute; width: 20px; height: 20px;
-            border-radius: 50%; background: var(--bg-secondary); top: 3px; left: 3px;
-            transition: all 0.2s ease-in-out;
-            box-shadow: 3px 3px 6px var(--shadow-dark), 
-                        -3px -3px 6px var(--shadow-light);
-        }
-        .toggle-label input { display: none; }
-        .toggle-label input:checked + .toggle-switch::before {
-            transform: translateX(24px);
-            background: var(--primary-color);
-            box-shadow: none;
-        }
+
         
         .quality-slider-container { margin-top: 0.5rem; }
         .quality-slider-container label {
@@ -310,12 +369,47 @@
                         inset -5px -5px 10px var(--shadow-light);
         }
         .file-list-header {
-            font-size: 0.8rem; font-weight: 500; color: var(--text-muted-color);
-            text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1.25rem;
-            flex-shrink: 0; text-shadow: 0 1px 1px var(--shadow-light);
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: var(--text-muted-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.75rem 1.25rem;
+            flex-shrink: 0;
+            text-shadow: 0 1px 1px var(--shadow-light);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
         #file-list { overflow-y: auto; flex-grow: 1; }
         .file-list-header, .file-item { display: grid; grid-template-columns: auto 1fr 1fr; gap: 1rem; align-items: center; }
+        
+        .file-list-footer {
+            border-top: 1px solid rgba(0,0,0,0.05);
+            flex-shrink: 0;
+        }
+        body.dark-theme .file-list-footer { border-top: 1px solid rgba(255,255,255,0.05); }
+        
+        .upload-more-btn {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: transparent;
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-m);
+            color: var(--text-muted-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .upload-more-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+            background: var(--active-bg-color);
+        }
         .file-item {
             font-size: 0.85rem; color: var(--text-color); padding: 0.75rem 1.25rem;
             border-top: 1px solid rgba(0,0,0,0.05);
@@ -336,7 +430,16 @@
         }
         .file-list-placeholder i { font-size: 2.5rem; margin-bottom: 1rem; }
         
-        #action-panel { margin-top: auto; padding-top: 1.5rem; }
+        #action-panel { 
+            margin-top: auto; 
+            padding-top: 1.5rem; 
+            flex-shrink: 0;
+            position: sticky;
+            bottom: 0;
+            background: var(--bg-primary);
+            z-index: 10;
+            padding-bottom: 1rem;
+        }
         #convert-btn {
             width: 100%; padding: 0.9rem 1rem; font-size: 1rem; font-weight: 500;
             background-color: var(--primary-color); color: white; border: none;
@@ -439,12 +542,19 @@
                         </div>
                     </div>
                     
-                    <h2 class="section-title">Post Processing</h2>
-                    <label class="toggle-label">
-                        <span>Apply Black & White Filter</span>
-                        <input type="checkbox" id="bw-filter">
-                        <span class="toggle-switch"></span>
-                    </label>
+                    <div class="option-toggle">
+                        <h2 class="section-title">Post Processing</h2>
+                        <div class="bw-filter-grid">
+                            <label class="bw-filter-btn">
+                                <input type="radio" name="bw-filter" value="disable" checked>
+                                <span class="bw-btn-text">Disabled</span>
+                            </label>
+                            <label class="bw-filter-btn">
+                                <input type="radio" name="bw-filter" value="enable">
+                                <span class="bw-btn-text">Enable</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="action-panel">
@@ -464,6 +574,12 @@
                         <span>Converted</span>
                     </div>
                     <div id="file-list"></div>
+                    <div class="file-list-footer">
+                        <button id="upload-more-btn" class="upload-more-btn">
+                            <i class="ri-add-line"></i>
+                            <span>Upload More Files</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -497,7 +613,7 @@
         const fileInput = document.getElementById('file-input');
         const fileList = document.getElementById('file-list');
         const formatRadios = document.querySelectorAll('input[name="format"]');
-        const bwCheckbox = document.getElementById('bw-filter');
+        const bwFilterRadios = document.querySelectorAll('input[name="bw-filter"]');
         const convertBtn = document.getElementById('convert-btn');
         const btnText = document.getElementById('btn-text');
         const statusMsg = document.getElementById('status');
@@ -509,6 +625,7 @@
         const jpgQualityValue = document.getElementById('jpg-quality-value');
         const webpQualitySlider = document.getElementById('webp-quality-slider');
         const webpQualityValue = document.getElementById('webp-quality-value');
+        const uploadMoreBtn = document.getElementById('upload-more-btn');
         
         let selectedFiles = [];
         let activePreviewIndex = -1;
@@ -539,6 +656,12 @@
         selectAllCheckbox.addEventListener('change', toggleSelectAll);
         jpgQualitySlider.addEventListener('input', () => updateQualityValue('jpg'));
         webpQualitySlider.addEventListener('input', () => updateQualityValue('webp'));
+        uploadMoreBtn.addEventListener('click', () => fileInput.click());
+        
+        // Add event listeners for bw filter radio buttons
+        bwFilterRadios.forEach(radio => {
+            radio.addEventListener('change', updateBwFilterText);
+        });
 
         function handleFiles(files) {
             selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
@@ -552,6 +675,7 @@
             updateConvertedFileNames();
             updateActivePreview(0); // Select the first file by default
             updateButtonState();
+            updateDropZoneAnimation();
 
             statusMsg.textContent = "";
             statusMsg.className = "";
@@ -559,6 +683,8 @@
 
         function populateFileList() {
             fileList.innerHTML = '';
+            const fragment = document.createDocumentFragment();
+            
             selectedFiles.forEach((file, index) => {
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
@@ -582,8 +708,10 @@
                 fileItem.appendChild(convertedNameSpan);
                 
                 fileItem.addEventListener('click', () => updateActivePreview(index));
-                fileList.appendChild(fileItem);
+                fragment.appendChild(fileItem);
             });
+            
+            fileList.appendChild(fragment);
             selectAllCheckbox.checked = true;
         }
 
@@ -591,8 +719,9 @@
             if (index === activePreviewIndex || !selectedFiles[index]) return;
             activePreviewIndex = index;
 
-            // Update UI highlight
-            document.querySelectorAll('.file-item').forEach(item => item.classList.remove('active'));
+            // Update UI highlight - cache the selector result
+            const fileItems = document.querySelectorAll('.file-item');
+            fileItems.forEach(item => item.classList.remove('active'));
             document.querySelector(`.file-item[data-index='${index}']`).classList.add('active');
 
             // Update canvas preview
@@ -612,7 +741,9 @@
         }
 
         function updateButtonState() {
-            const checkedCount = document.querySelectorAll('.file-item input[type="checkbox"]:checked').length;
+            // Cache the selector to avoid repeated DOM queries
+            const checkedBoxes = document.querySelectorAll('.file-item input[type="checkbox"]:checked');
+            const checkedCount = checkedBoxes.length;
             convertBtn.disabled = checkedCount === 0;
             selectAllCheckbox.checked = checkedCount === selectedFiles.length;
 
@@ -625,7 +756,9 @@
 
         function toggleSelectAll() {
             const isChecked = selectAllCheckbox.checked;
-            document.querySelectorAll('.file-item input[type="checkbox"]').forEach(cb => cb.checked = isChecked);
+            // Cache the selector to avoid repeated DOM queries
+            const checkboxes = document.querySelectorAll('.file-item input[type="checkbox"]');
+            checkboxes.forEach(cb => cb.checked = isChecked);
             updateButtonState();
         }
 
@@ -640,6 +773,7 @@
             btnText.textContent = "Select Files";
             previewContainer.style.display = 'none';
             activePreviewIndex = -1;
+            updateDropZoneAnimation();
         }
 
         function updateConvertedFileNames() {
@@ -663,7 +797,8 @@
             
             // Update file names only if files are selected
             if (selectedFiles.length === 0) return;
-            fileList.querySelectorAll('.file-item').forEach((item, index) => {
+            const fileItems = fileList.querySelectorAll('.file-item');
+            fileItems.forEach((item, index) => {
                 const originalName = selectedFiles[index].name;
                 const baseName = originalName.substring(0, originalName.lastIndexOf('.'));
                 const newFileName = `${baseName}.${format}`;
@@ -678,6 +813,27 @@
             } else if (format === 'webp') {
                 webpQualityValue.textContent = webpQualitySlider.value + '%';
                 updateSliderFill(webpQualitySlider);
+            }
+        }
+        
+        function updateBwFilterText() {
+            const selectedValue = document.querySelector('input[name="bw-filter"]:checked').value;
+            const btnTexts = document.querySelectorAll('.bw-btn-text');
+            
+            if (selectedValue === 'enable') {
+                btnTexts[0].textContent = 'Disable';
+                btnTexts[1].textContent = 'Enabled';
+            } else {
+                btnTexts[0].textContent = 'Disabled';
+                btnTexts[1].textContent = 'Enable';
+            }
+        }
+        
+        function updateDropZoneAnimation() {
+            if (selectedFiles.length === 0) {
+                dropZone.classList.remove('has-files');
+            } else {
+                dropZone.classList.add('has-files');
             }
         }
         
@@ -718,7 +874,7 @@
 
         async function startConversionProcess() {
             const format = document.querySelector('input[name="format"]:checked').value;
-            const applyBwFilter = bwCheckbox.checked;
+            const applyBwFilter = document.querySelector('input[name="bw-filter"]:checked').value === 'enable';
 
             const filesToConvert = selectedFiles.filter((file, index) => {
                 return document.querySelector(`.file-item[data-index='${index}'] input[type="checkbox"]`).checked;
