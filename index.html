@@ -135,6 +135,55 @@
         .toggle-label input:checked + .toggle-switch { background-color: var(--primary-color); }
         .toggle-label input:checked + .toggle-switch::before { transform: translateX(20px); }
         
+        .quality-slider-container {
+            margin-top: 0.5rem;
+        }
+        .quality-slider-container label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-color);
+        }
+        .quality-slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border-color);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .quality-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid var(--surface-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .quality-slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid var(--surface-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .quality-slider::-webkit-slider-track {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        .quality-slider::-moz-range-track {
+            background: var(--border-color);
+            border-radius: 3px;
+        }
+        
         #file-list-container {
             background-color: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color);
             flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
@@ -183,7 +232,7 @@
 
     <div class="app-container">
         <header>
-            <h1><i class="ri-image-edit-line"></i>Pro Image Converter</h1>
+            <h1><i class="ri-image-edit-line"></i>Converter</h1>
             <p>Select, preview, filter, and convert your images with unparalleled control.</p>
         </header>
 
@@ -205,6 +254,17 @@
                         <label> <input type="radio" name="format" value="png" checked> <span>PNG</span> </label>
                         <label> <input type="radio" name="format" value="jpg"> <span>JPG</span> </label>
                         <label> <input type="radio" name="format" value="webp"> <span>WEBP</span> </label>
+                    </div>
+                    
+                    <div id="quality-control" style="display: none;">
+                        <div class="quality-slider-container" id="jpg-quality" style="display: none;">
+                            <label for="jpg-quality-slider">JPG Quality: <span id="jpg-quality-value">90</span>%</label>
+                            <input type="range" id="jpg-quality-slider" min="1" max="100" value="90" class="quality-slider">
+                        </div>
+                        <div class="quality-slider-container" id="webp-quality" style="display: none;">
+                            <label for="webp-quality-slider">WEBP Quality: <span id="webp-quality-value">90</span>%</label>
+                            <input type="range" id="webp-quality-slider" min="1" max="100" value="90" class="quality-slider">
+                        </div>
                     </div>
                     
                     <h2 class="section-title">Post Processing</h2>
@@ -249,6 +309,11 @@
         const previewContainer = document.getElementById('preview-container');
         const previewCanvas = document.getElementById('preview-canvas');
         const selectAllCheckbox = document.getElementById('select-all-checkbox');
+        const qualityControl = document.getElementById('quality-control');
+        const jpgQualitySlider = document.getElementById('jpg-quality-slider');
+        const jpgQualityValue = document.getElementById('jpg-quality-value');
+        const webpQualitySlider = document.getElementById('webp-quality-slider');
+        const webpQualityValue = document.getElementById('webp-quality-value');
         
         let selectedFiles = [];
         let activePreviewIndex = -1;
@@ -263,6 +328,8 @@
         convertBtn.addEventListener('click', startConversionProcess);
         formatRadios.forEach(radio => radio.addEventListener('change', updateConvertedFileNames));
         selectAllCheckbox.addEventListener('change', toggleSelectAll);
+        jpgQualitySlider.addEventListener('input', () => updateQualityValue('jpg'));
+        webpQualitySlider.addEventListener('input', () => updateQualityValue('webp'));
 
         function handleFiles(files) {
             selectedFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
@@ -367,14 +434,37 @@
         }
 
         function updateConvertedFileNames() {
-            if (selectedFiles.length === 0) return;
             const format = document.querySelector('input[name="format"]:checked').value;
+            
+            // Show/hide quality control based on format
+            if (format === 'jpg') {
+                qualityControl.style.display = 'block';
+                document.getElementById('jpg-quality').style.display = 'block';
+                document.getElementById('webp-quality').style.display = 'none';
+            } else if (format === 'webp') {
+                qualityControl.style.display = 'block';
+                document.getElementById('jpg-quality').style.display = 'none';
+                document.getElementById('webp-quality').style.display = 'block';
+            } else {
+                qualityControl.style.display = 'none';
+            }
+            
+            // Update file names only if files are selected
+            if (selectedFiles.length === 0) return;
             fileList.querySelectorAll('.file-item').forEach((item, index) => {
                 const originalName = selectedFiles[index].name;
                 const baseName = originalName.substring(0, originalName.lastIndexOf('.'));
                 const newFileName = `${baseName}.${format}`;
                 item.querySelector('.converted-name').textContent = newFileName;
             });
+        }
+        
+        function updateQualityValue(format) {
+            if (format === 'jpg') {
+                jpgQualityValue.textContent = jpgQualitySlider.value;
+            } else if (format === 'webp') {
+                webpQualityValue.textContent = webpQualitySlider.value;
+            }
         }
 
         async function startConversionProcess() {
@@ -432,16 +522,37 @@
                             case 'webp': mimeType = 'image/webp'; break;
                         }
                         
-                        const quality = (format === 'jpg' || format === 'webp') ? 1.0 : undefined;
-                        const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+                        let quality;
+                        if (format === 'jpg') {
+                            quality = parseInt(jpgQualitySlider.value) / 100;
+                        } else if (format === 'webp') {
+                            quality = parseInt(webpQualitySlider.value) / 100;
+                        } else {
+                            quality = undefined;
+                        }
+                        const dotIndex = file.name.lastIndexOf('.');
+                        const baseName = dotIndex !== -1 ? file.name.substring(0, dotIndex) : file.name;
                         const newFileName = `${baseName}.${format}`;
 
-                        canvas.toBlob(blob => {
+                        let timeoutId;
+                        const onBlob = (blob) => {
+                            clearTimeout(timeoutId);
                             if (blob) resolve({ filename: newFileName, blob });
                             else reject(new Error(`Failed to create blob for ${file.name}`));
-                        }, mimeType, quality);
+                        };
+                        // Timeout after 10 seconds
+                        timeoutId = setTimeout(() => {
+                            reject(new Error(`Timed out creating blob for ${file.name}`));
+                        }, 10000);
+                        try {
+                            canvas.toBlob(onBlob, mimeType, quality);
+                        } catch (err) {
+                            clearTimeout(timeoutId);
+                            reject(new Error(`Exception in toBlob for ${file.name}: ${err.message}`));
+                        }
                     };
                     img.onerror = () => reject(new Error(`Could not load image: ${file.name}`));
+                    img.src = e.target.result;
                 };
                 reader.onerror = () => reject(new Error(`Could not read file: ${file.name}`));
                 reader.readAsDataURL(file);
