@@ -14,7 +14,9 @@
 
     <style>
         :root {
-            --bg-color: #eef1f5;
+            /* Light Theme (Default) */
+            --bg-primary: #eef1f5;
+            --bg-secondary: #ffffff;
             --primary-color: #4a77e2;
             --primary-hover-color: #3b5fbb;
             --text-color: #3d4a5c;
@@ -28,13 +30,26 @@
             --radius-l: 20px;
             --radius-m: 12px;
             --radius-s: 8px;
+            --transition-speed: 0.3s;
+        }
+
+        body.dark-theme {
+            /* Dark Theme Variables */
+            --bg-primary: #2c2f36;
+            --bg-secondary: #1e1e1e;
+            --text-color: #e5e7eb;
+            --text-muted-color: #808a9b;
+            --glass-bg: rgba(44, 47, 54, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-light: rgba(255, 255, 255, 0.05); /* Subtle white glow */
+            --shadow-dark: #202227; /* Deep dark shadow */
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-primary);
             color: var(--text-color);
             display: flex;
             justify-content: center;
@@ -43,6 +58,7 @@
             padding: 2rem;
             position: relative;
             overflow: hidden;
+            transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
         }
 
         body::before, body::after {
@@ -51,7 +67,7 @@
             border-radius: 50%;
             filter: blur(120px);
             z-index: -1;
-            opacity: 0.8;
+            transition: opacity var(--transition-speed) ease;
         }
 
         body::before {
@@ -60,6 +76,7 @@
             background: linear-gradient(to right, #89f7fe, #66a6ff);
             top: -15%;
             left: -15%;
+            opacity: 0.8;
         }
 
         body::after {
@@ -68,6 +85,11 @@
             background: linear-gradient(to right, #ffafbd, #ffc3a0);
             bottom: -10%;
             right: -10%;
+            opacity: 0.8;
+        }
+        
+        body.dark-theme::before, body.dark-theme::after {
+             opacity: 0.4;
         }
 
         .app-container {
@@ -83,27 +105,59 @@
             display: flex;
             flex-direction: column;
             max-height: calc(100vh - 4rem);
+            transition: background var(--transition-speed) ease, border-color var(--transition-speed) ease;
         }
 
         header {
             padding: 1.5rem 2rem;
             flex-shrink: 0;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+            text-shadow: 0 1px 1px var(--shadow-light);
+            position: relative;
         }
         header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.75rem; }
         header h1 i { color: var(--primary-color); }
         header p { font-size: 0.9rem; color: var(--text-muted-color); margin-top: 0.25rem; }
 
-        .main-content {
+        .theme-toggle-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
             display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--text-muted-color);
+            background: var(--bg-color);
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light);
+            transition: all var(--transition-speed) ease;
+        }
+        .theme-toggle-btn:hover { color: var(--primary-color); }
+        .theme-toggle-btn:active {
+            box-shadow: inset 2px 2px 4px var(--shadow-dark), inset -2px -2px 4px var(--shadow-light);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
             gap: 2rem;
             padding: 0 2rem 2rem;
             flex-grow: 1;
             overflow: hidden;
         }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
 
-        .left-column { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding-right: 1rem; }
-        .right-column { flex: 1; display: flex; flex-direction: column; min-height: 0; }
+        .left-column { display: flex; flex-direction: column; overflow-y: auto; padding-right: 1rem; }
+        .right-column { display: flex; flex-direction: column; min-height: 0; }
         
         #drop-zone {
             border: none;
@@ -116,10 +170,40 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            min-height: 250px;
-            background: transparent;
+            min-height: 150px;
+            background: var(--bg-secondary);
             box-shadow: inset 5px 5px 10px var(--shadow-dark), 
                         inset -5px -5px 10px var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #drop-zone::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                -45deg,
+                transparent 0%,
+                rgba(74, 119, 226, 0.1) 25%,
+                rgba(74, 119, 226, 0.2) 50%,
+                rgba(74, 119, 226, 0.1) 75%,
+                transparent 100%
+            );
+            z-index: 1;
+        }
+        
+        #drop-zone:hover::before {
+            left: 100%;
+            transition: left 0.6s ease;
+        }
+        
+        #drop-zone > * {
+            position: relative;
+            z-index: 2;
         }
         #drop-zone.drag-over { 
             box-shadow: inset 7px 7px 14px var(--shadow-dark), 
@@ -142,18 +226,23 @@
                         -5px -5px 10px var(--shadow-light);
         }
 
-        .section-title {
-            font-size: 0.8rem; font-weight: 500; color: var(--text-muted-color);
-            text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 1rem;
-            text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+        
+        h2 {
+            font-size: 0.8rem; font-weight: 500; color: var(--text-color);
+            text-transform: uppercase; letter-spacing: 0.05em; margin: 1.5rem 0 2rem;
+            text-shadow: 0 1px 1px var(--shadow-light);
+        }
+        
+        label {
+            color: var(--text-muted-color);
         }
 
-        .options-grid { display: flex; gap: 1rem; }
+        .options-grid { display: flex; gap: 1rem; margin-bottom: 1.5rem;}
         .options-grid label {
             display: flex; align-items: center; gap: 0.5rem; cursor: pointer;
             padding: 0.75rem 1rem; border-radius: var(--radius-m);
             transition: all 0.2s ease; flex-grow: 1; justify-content: center;
-            background: var(--bg-color);
+            background: transparent;
             font-weight: 500;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
         }
@@ -162,7 +251,6 @@
             box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             color: var(--primary-color);
         }
-        .options-grid input[type="radio"]:checked + span { color: var(--primary-color); }
         
         .toggle-label {
             display: flex; align-items: center; justify-content: space-between;
@@ -176,7 +264,7 @@
         }
         .toggle-switch::before {
             content: ''; position: absolute; width: 20px; height: 20px;
-            border-radius: 50%; background: var(--bg-color); top: 3px; left: 3px;
+            border-radius: 50%; background: var(--bg-secondary); top: 3px; left: 3px;
             transition: all 0.2s ease-in-out;
             box-shadow: 3px 3px 6px var(--shadow-dark), 
                         -3px -3px 6px var(--shadow-light);
@@ -195,35 +283,36 @@
         }
         .quality-slider {
             width: 100%; height: 8px; border-radius: 4px;
-            background: transparent; outline: none; -webkit-appearance: none; appearance: none;
+            background: linear-gradient(to right, var(--shadow-light) 0%, var(--shadow-light) 50%, transparent 50%, transparent 100%);
+            outline: none; -webkit-appearance: none; appearance: none;
             box-shadow: inset 2px 2px 4px var(--shadow-dark), 
                         inset -2px -2px 4px var(--shadow-light);
         }
         .quality-slider::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none;
             width: 20px; height: 20px; border-radius: 50%;
-            background: var(--bg-color); cursor: pointer;
+            background: var(--bg-secondary); cursor: pointer;
             box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
             transition: background-color 0.2s ease;
         }
         .quality-slider::-webkit-slider-thumb:hover { background: var(--primary-color); }
         .quality-slider::-moz-range-thumb {
             width: 20px; height: 20px; border-radius: 50%;
-            background: var(--bg-color); cursor: pointer; border: none;
+            background: var(--bg-secondary); cursor: pointer; border: none;
             box-shadow: 4px 4px 8px var(--shadow-dark), -4px -4px 8px var(--shadow-light);
         }
         
         #file-list-container {
             border-radius: var(--radius-l);
             flex-grow: 1; display: flex; flex-direction: column; overflow: hidden;
-            background: transparent;
+            background: var(--bg-secondary);
             box-shadow: inset 5px 5px 10px var(--shadow-dark), 
                         inset -5px -5px 10px var(--shadow-light);
         }
         .file-list-header {
             font-size: 0.8rem; font-weight: 500; color: var(--text-muted-color);
             text-transform: uppercase; letter-spacing: 0.05em; padding: 0.75rem 1.25rem;
-            flex-shrink: 0; text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+            flex-shrink: 0; text-shadow: 0 1px 1px var(--shadow-light);
         }
         #file-list { overflow-y: auto; flex-grow: 1; }
         .file-list-header, .file-item { display: grid; grid-template-columns: auto 1fr 1fr; gap: 1rem; align-items: center; }
@@ -233,8 +322,9 @@
             cursor: pointer;
             transition: background-color 0.2s ease;
         }
+        body.dark-theme .file-item { border-top: 1px solid rgba(255,255,255,0.05); }
         .file-item:first-child { border-top: none; }
-        .file-item.active, .file-item:hover { background-color: rgba(255, 255, 255, 0.4); }
+        .file-item.active, .file-item:hover { background-color: var(--glass-bg); }
         .file-item span {
             font-family: 'SF Mono', SFMono-Regular, ui-monospace, Menlo, Consolas, Monaco, 'Courier New', monospace;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -253,6 +343,36 @@
             border-radius: var(--radius-m); cursor: pointer; transition: all 0.2s ease;
             display: flex; justify-content: center; align-items: center; gap: 0.5rem;
             box-shadow: 5px 5px 10px var(--shadow-dark), -5px -5px 10px var(--shadow-light);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #convert-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                -45deg,
+                transparent 0%,
+                rgba(255, 255, 255, 0.2) 25%,
+                rgba(255, 255, 255, 0.4) 50%,
+                rgba(255, 255, 255, 0.2) 75%,
+                transparent 100%
+            );
+            z-index: 1;
+        }
+        
+        #convert-btn:hover:not(:disabled)::before {
+            left: 100%;
+            transition: left 0.6s ease;
+        }
+        
+        #convert-btn > * {
+            position: relative;
+            z-index: 2;
         }
         #convert-btn:hover:not(:disabled) { background-color: var(--primary-hover-color); }
         #convert-btn:active:not(:disabled) {
@@ -262,7 +382,7 @@
         #convert-btn:disabled {
             background-color: var(--bg-color);
             color: var(--text-muted-color);
-            box-shadow: none;
+            box-shadow: inset 3px 3px 6px var(--shadow-dark), inset -3px -3px 6px var(--shadow-light);
             cursor: not-allowed;
             opacity: 1;
         }
@@ -277,6 +397,9 @@
         <header>
             <h1><i class="ri-image-edit-line"></i>Converter</h1>
             <p>Select, preview, filter, and convert your images with unparalleled control.</p>
+            <button id="theme-toggle" class="theme-toggle-btn" title="Toggle Theme">
+                <i class="ri-moon-line"></i>
+            </button>
         </header>
 
         <div class="main-content">
@@ -301,11 +424,17 @@
                     
                     <div id="quality-control" style="display: none;">
                         <div class="quality-slider-container" id="jpg-quality" style="display: none;">
-                            <label for="jpg-quality-slider">JPG Quality: <span id="jpg-quality-value">90</span>%</label>
+                            <label for="jpg-quality-slider">
+                                <span>JPG Quality:</span>
+                                <span id="jpg-quality-value">90%</span>
+                            </label>
                             <input type="range" id="jpg-quality-slider" min="1" max="100" value="90" class="quality-slider">
                         </div>
                         <div class="quality-slider-container" id="webp-quality" style="display: none;">
-                            <label for="webp-quality-slider">WEBP Quality: <span id="webp-quality-value">90</span>%</label>
+                            <label for="webp-quality-slider">
+                                <span>WEBP Quality:</span>
+                                <span id="webp-quality-value">90%</span>
+                            </label>
                             <input type="range" id="webp-quality-slider" min="1" max="100" value="90" class="quality-slider">
                         </div>
                     </div>
@@ -341,6 +470,29 @@
     </div>
 
     <script>
+        // --- THEME TOGGLE SCRIPT ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const body = document.body;
+        const themeIcon = themeToggle.querySelector('i');
+        const THEME_KEY = 'imageConverterTheme';
+
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                body.classList.add('dark-theme');
+                themeIcon.className = 'ri-sun-line';
+            } else {
+                body.classList.remove('dark-theme');
+                themeIcon.className = 'ri-moon-line';
+            }
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark-theme') ? 'light' : 'dark';
+            localStorage.setItem(THEME_KEY, newTheme);
+            applyTheme(newTheme);
+        });
+        
+        // --- MAIN APP SCRIPT ---
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const fileList = document.getElementById('file-list');
@@ -361,7 +513,21 @@
         let selectedFiles = [];
         let activePreviewIndex = -1;
 
-        document.addEventListener('DOMContentLoaded', showPlaceholder);
+        // Initialize page state
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+            applyTheme(savedTheme);
+            showPlaceholder();
+            updateSliderFill(jpgQualitySlider);
+            updateSliderFill(webpQualitySlider);
+            updateConvertedFileNames();
+            const currentFormat = document.querySelector('input[name="format"]:checked').value;
+            if (currentFormat === 'jpg') {
+                updateQualityValue('jpg');
+            } else if (currentFormat === 'webp') {
+                updateQualityValue('webp');
+            }
+        });
 
         dropZone.addEventListener('click', () => fileInput.click());
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
@@ -480,14 +646,17 @@
             const format = document.querySelector('input[name="format"]:checked').value;
             
             // Show/hide quality control based on format
-            if (format === 'jpg') {
+            if (format === 'jpg' || format === 'webp') {
                 qualityControl.style.display = 'block';
-                document.getElementById('jpg-quality').style.display = 'block';
-                document.getElementById('webp-quality').style.display = 'none';
-            } else if (format === 'webp') {
-                qualityControl.style.display = 'block';
-                document.getElementById('jpg-quality').style.display = 'none';
-                document.getElementById('webp-quality').style.display = 'block';
+                document.getElementById('jpg-quality').style.display = format === 'jpg' ? 'block' : 'none';
+                document.getElementById('webp-quality').style.display = format === 'webp' ? 'block' : 'none';
+                
+                // Update slider fill for the visible slider
+                if (format === 'jpg') {
+                    updateSliderFill(jpgQualitySlider);
+                } else if (format === 'webp') {
+                    updateSliderFill(webpQualitySlider);
+                }
             } else {
                 qualityControl.style.display = 'none';
             }
@@ -504,9 +673,46 @@
         
         function updateQualityValue(format) {
             if (format === 'jpg') {
-                jpgQualityValue.textContent = jpgQualitySlider.value;
+                jpgQualityValue.textContent = jpgQualitySlider.value + '%';
+                updateSliderFill(jpgQualitySlider);
             } else if (format === 'webp') {
-                webpQualityValue.textContent = webpQualitySlider.value;
+                webpQualityValue.textContent = webpQualitySlider.value + '%';
+                updateSliderFill(webpQualitySlider);
+            }
+        }
+        
+        function updateSliderFill(slider) {
+            const value = slider.value;
+            const percentage = value + '%';
+            const glowIntensity = value / 100; // 0 to 1
+            const glowBlur = Math.max(2, glowIntensity * 15); // 2px to 17px blur
+            const glowOpacity = Math.max(0.1, glowIntensity * 0.8); // 0.1 to 0.9 opacity
+            
+            // Create a gradient that includes the glow effect only in the filled area
+            const glowColor = `rgba(74, 119, 226, ${glowOpacity})`;
+            slider.style.background = `linear-gradient(to right, 
+                var(--primary-color) 0%, 
+                var(--primary-color) ${percentage}, 
+                transparent ${percentage}, 
+                transparent 100%)`;
+            
+            // Add inner glow only to the filled area using a second gradient
+            if (value > 0) {
+                const glowGradient = `linear-gradient(to right, 
+                    ${glowColor} 0%, 
+                    ${glowColor} ${percentage}, 
+                    transparent ${percentage}, 
+                    transparent 100%)`;
+                slider.style.background = `${glowGradient}, ${slider.style.background}`;
+                
+                // Add outer glow with reduced intensity to avoid affecting unfilled area too much
+                const outerGlowOpacity = glowOpacity * 0.3; // Much more subtle outer glow
+                slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark), 
+                                         inset -2px -2px 4px var(--shadow-light),
+                                         0 0 ${glowBlur}px rgba(74, 119, 226, ${outerGlowOpacity})`;
+            } else {
+                slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark), 
+                                         inset -2px -2px 4px var(--shadow-light)`;
             }
         }
 
