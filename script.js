@@ -303,10 +303,10 @@ function updateSliderFill(slider) {
     const glowBlur = Math.max(2, glowIntensity * 15);
     const glowOpacity = Math.max(0.1, glowIntensity * 0.8);
 
-    const glowColor = `rgba(74, 119, 226, ${glowOpacity})`;
+    const glowColor = `hsla(221, 73%, 59%, ${glowOpacity})`;
     slider.style.background = `linear-gradient(to right,
-        var(--accent-color) 0%,
-        var(--accent-color) ${percentage},
+        var(--accent) 0%,
+        var(--accent) ${percentage},
         transparent ${percentage},
         transparent 100%)`;
 
@@ -321,7 +321,7 @@ function updateSliderFill(slider) {
         const outerGlowOpacity = glowOpacity * 0.3;
         slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark),
                                  inset -2px -2px 4px var(--shadow-light),
-                                 0 0 ${glowBlur}px rgba(74, 119, 226, ${outerGlowOpacity})`;
+                                 0 0 ${glowBlur}px hsla(221, 73%, 59%, ${outerGlowOpacity})`;
     } else {
         slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark),
                                  inset -2px -2px 4px var(--shadow-light)`;
