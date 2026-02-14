@@ -28,22 +28,12 @@ function toggleInfoTooltip() {
     const isVisible = infoTooltip.classList.toggle('show');
     const icon = infoBtn.querySelector('i');
     icon.className = isVisible ? 'ri-close-line' : 'ri-information-line';
-
-    const appContainer = document.querySelector('.app-container');
-    if (isVisible) {
-        appContainer.classList.add('blur-behind');
-    } else {
-        appContainer.classList.remove('blur-behind');
-    }
 }
 
 function closeInfoTooltip() {
     infoTooltip.classList.remove('show');
     const icon = infoBtn.querySelector('i');
     icon.className = 'ri-information-line';
-
-    const appContainer = document.querySelector('.app-container');
-    appContainer.classList.remove('blur-behind');
 }
 
 infoBtn.addEventListener('click', toggleInfoTooltip);
@@ -299,33 +289,11 @@ function updateDropZoneAnimation() {
 function updateSliderFill(slider) {
     const value = slider.value;
     const percentage = value + '%';
-    const glowIntensity = value / 100;
-    const glowBlur = Math.max(2, glowIntensity * 15);
-    const glowOpacity = Math.max(0.1, glowIntensity * 0.8);
-
-    const glowColor = `hsla(221, 73%, 59%, ${glowOpacity})`;
     slider.style.background = `linear-gradient(to right,
         var(--accent) 0%,
         var(--accent) ${percentage},
-        transparent ${percentage},
-        transparent 100%)`;
-
-    if (value > 0) {
-        const glowGradient = `linear-gradient(to right,
-            ${glowColor} 0%,
-            ${glowColor} ${percentage},
-            transparent ${percentage},
-            transparent 100%)`;
-        slider.style.background = `${glowGradient}, ${slider.style.background}`;
-
-        const outerGlowOpacity = glowOpacity * 0.3;
-        slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark),
-                                 inset -2px -2px 4px var(--shadow-light),
-                                 0 0 ${glowBlur}px hsla(221, 73%, 59%, ${outerGlowOpacity})`;
-    } else {
-        slider.style.boxShadow = `inset 2px 2px 4px var(--shadow-dark),
-                                 inset -2px -2px 4px var(--shadow-light)`;
-    }
+        var(--border) ${percentage},
+        var(--border) 100%)`;
 }
 
 async function startConversionProcess() {
